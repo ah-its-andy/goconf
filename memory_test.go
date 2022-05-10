@@ -41,7 +41,7 @@ func TestBuildMemoryProviderShouldPanic(t *testing.T) {
 		}
 	}()
 
-	goconf.Memory(nil).BuildProvider(nil)
+	goconf.NewMemoryProvider(nil)
 }
 
 func TestBuildMemoryProviderAddShouldPassed(t *testing.T) {
