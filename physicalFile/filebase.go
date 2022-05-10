@@ -2,6 +2,7 @@ package physicalfile
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -9,7 +10,7 @@ import (
 	"github.com/ah-its-andy/goconf"
 )
 
-type ResolvePhysicalFile func(*os.File) (map[string]*goconf.ExtractedValue, error)
+type ResolvePhysicalFile func(io.Reader) (map[string]*goconf.ExtractedValue, error)
 
 var _ goconf.Source = (*PhysicalFileSource)(nil)
 
@@ -18,6 +19,7 @@ type PhysicalFileSource struct {
 
 	// 文件路径
 	FilePath string
+	reader   io.Reader
 	fn       ResolvePhysicalFile
 }
 
@@ -32,11 +34,18 @@ func PhysicalFile(filePath string, fn ResolvePhysicalFile) *PhysicalFileSource {
 	}
 }
 
+func FromReader(reader io.Reader, fn ResolvePhysicalFile) *PhysicalFileSource {
+	return &PhysicalFileSource{
+		reader: reader,
+		fn:     fn,
+	}
+}
+
 func (source *PhysicalFileSource) BuildProvider(builder goconf.Builder) goconf.Provider {
 	return &PhysicalFileProvider{
 		ConfigurationProvider: *goconf.NewConfigurationProvider(),
 		Source:                source,
-		LoadFile:              loadYamlFile,
+		LoadFile:              source.fn,
 	}
 }
 
@@ -45,8 +54,8 @@ func (source *PhysicalFileSource) ResolveFile() error {
 		len(source.FilePath) > 0 {
 		fileInfo, err := os.Stat(source.FilePath)
 		if err != nil {
-			if err == os.ErrNotExist {
-				return fmt.Errorf("file not exists: %s", source.FilePath)
+			if os.IsNotExist(err) {
+				return os.ErrNotExist
 			} else {
 				return err
 			}
@@ -63,10 +72,10 @@ type PhysicalFileProvider struct {
 
 	Source *PhysicalFileSource
 
-	LoadFile func(*os.File) (map[string]*goconf.ExtractedValue, error)
+	LoadFile ResolvePhysicalFile
 }
 
-func NewPhysicalFileProvider(source *PhysicalFileSource, loadFile func(*os.File) (map[string]*goconf.ExtractedValue, error)) *PhysicalFileProvider {
+func NewPhysicalFileProvider(source *PhysicalFileSource, loadFile ResolvePhysicalFile) *PhysicalFileProvider {
 	return &PhysicalFileProvider{
 		ConfigurationProvider: *goconf.NewConfigurationProvider(),
 		Source:                source,
@@ -89,15 +98,19 @@ func (provider *PhysicalFileProvider) Load() error {
 	}
 
 	if provider.Source == nil ||
-		provider.Source.fileInfo == nil {
+		(provider.Source.fileInfo == nil && provider.Source.reader == nil) {
 		return fmt.Errorf("source not initialized")
 	}
-	file, err := os.OpenFile(provider.Source.FilePath, os.O_RDONLY, 0755)
-	if err != nil {
-		return err
+	reader := provider.Source.reader
+	if provider.Source.fileInfo != nil {
+		file, err := os.OpenFile(provider.Source.FilePath, os.O_RDONLY, 0755)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+		reader = file
 	}
-	defer file.Close()
-	data, err := provider.LoadFile(file)
+	data, err := provider.LoadFile(reader)
 	if err != nil {
 		return err
 	}

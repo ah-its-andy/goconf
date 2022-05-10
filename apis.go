@@ -40,6 +40,10 @@ func Init(fn func(Builder)) {
 	builder := NewBuilder()
 	fn(builder)
 	initialized = builder.BuildRoot()
+	err := initialized.Reload()
+	if err != nil {
+		panic(err)
+	}
 }
 
 func panicIfNotInitialized() {

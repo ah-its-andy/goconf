@@ -2,18 +2,22 @@ package physicalfile
 
 import (
 	"encoding/json"
+	"io"
 	"io/ioutil"
-	"os"
 
 	"github.com/ah-its-andy/goconf"
 )
 
 func Json(filePath string) *PhysicalFileSource {
-	return PhysicalFile(filePath, loadYamlFile)
+	return PhysicalFile(filePath, ResolvePhysicalFile(loadJsonlFile))
 }
 
-func loadJsonlFile(f *os.File) (map[string]*goconf.ExtractedValue, error) {
-	fileBytes, err := ioutil.ReadAll(f)
+func JsonReader(reader io.Reader) *PhysicalFileSource {
+	return FromReader(reader, ResolvePhysicalFile(loadJsonlFile))
+}
+
+func loadJsonlFile(reader io.Reader) (map[string]*goconf.ExtractedValue, error) {
+	fileBytes, err := ioutil.ReadAll(reader)
 	if err != nil {
 		return nil, err
 	}

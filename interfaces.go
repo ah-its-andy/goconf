@@ -68,7 +68,7 @@ func ExtractStructToMap(data interface{}, path string) map[string]*ExtractedValu
 	valueType := reflect.TypeOf(data)
 	if valueType.Kind() == reflect.Map {
 		ret[path] = NewExtractedValue(path, "", data)
-		subMap := ExtractMap(data.(map[string]interface{}), path)
+		subMap := ExtractMap(data, path)
 		for subKey, subValue := range subMap {
 			ret[subKey] = subValue
 		}
@@ -99,17 +99,26 @@ func ExtractStructToMap(data interface{}, path string) map[string]*ExtractedValu
 	return ret
 }
 
-func ExtractMap(data map[string]interface{}, path string) map[string]*ExtractedValue {
+func ExtractMap(data interface{}, path string) map[string]*ExtractedValue {
 	ret := make(map[string]*ExtractedValue)
-	for k, v := range data {
-		subPath := CombinePath(path, k)
-		subMap := ExtractStructToMap(v, subPath)
+	mapRange := reflect.ValueOf(data).MapRange()
+	for mapRange.Next() {
+		var subPath string
+		key := mapRange.Key()
+		v := mapRange.Value()
+		if k, ok := key.Interface().(string); ok {
+			subPath = CombinePath(path, k)
+		} else {
+			subPath = CombinePath(path, fmt.Sprintf("%v", key.Interface()))
+		}
+		subMap := ExtractStructToMap(v.Interface(), subPath)
 		if subMap == nil || len(subMap) == 0 {
 			continue
 		}
 		for subKey, subValue := range subMap {
 			ret[subKey] = subValue
 		}
+		continue
 	}
 
 	return ret

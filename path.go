@@ -4,6 +4,7 @@ import "strings"
 
 var KeyDelimiter = "."
 
+// Combine paths to one path with KeyDelimiter
 func CombinePath(pathSegments ...string) string {
 	if len(pathSegments) == 0 {
 		panic("pathSegments is empty")
@@ -18,6 +19,7 @@ func CombinePath(pathSegments ...string) string {
 	return strings.Join(paths, KeyDelimiter)
 }
 
+// Get last path segment
 func GetSectionKey(path string) string {
 	if len(path) == 0 {
 		panic("path is empty")
@@ -29,6 +31,7 @@ func GetSectionKey(path string) string {
 	return path[lastDelimiterIndex+1:]
 }
 
+// Get parent path
 func GetParentPath(path string) (string, bool) {
 	if len(path) == 0 {
 		panic("path is empty")

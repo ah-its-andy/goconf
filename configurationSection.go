@@ -58,23 +58,55 @@ func (section *ConfigurationSection) Bind(recv interface{}) error {
 		rawType := reflect.TypeOf(extracted.Raw)
 
 		if rawType.Kind() == reflect.Map {
-			return bindMap(recv, extracted.Raw.(map[string]interface{}))
+			return bindMap(recv, repackMap(extracted.Raw))
 		} else {
 			return fmt.Errorf("Not supported type %s", rawType.Kind())
 		}
 	}
 }
 
+func repackMap(data interface{}) map[string]interface{} {
+	ret := make(map[string]interface{})
+	valueType := reflect.TypeOf(data)
+	if valueType.Kind() == reflect.Map {
+		iter := reflect.ValueOf(data).MapRange()
+		for iter.Next() {
+			key := fmt.Sprintf("%v", iter.Key().Interface())
+			ret[key] = iter.Value().Interface()
+		}
+	}
+	return ret
+}
+
 func bindMap(recv interface{}, mapValue map[string]interface{}) error {
-	cfg := &mapstructure.DecoderConfig{
-		Metadata: nil,
-		Result:   &recv,
-		TagName:  "json",
+	if reflect.TypeOf(recv).Kind() != reflect.Ptr {
+		return fmt.Errorf("recv must be a pointer")
 	}
-	decoder, _ := mapstructure.NewDecoder(cfg)
-	err := decoder.Decode(mapValue)
-	if err != nil {
-		return err
+
+	if recvMap, ok := recv.(*map[string]interface{}); ok {
+		// create new map[string]interface{} pointer when recv is nil
+		if reflect.ValueOf(recv).Elem().IsNil() {
+			*recvMap = make(map[string]interface{})
+		}
+		recvValue := reflect.ValueOf(recvMap).Elem()
+		// copy mapValue to recv
+		for key, value := range mapValue {
+			k := reflect.ValueOf(key)
+			recvValue.SetMapIndex(k, reflect.ValueOf(value))
+		}
+
+		return nil
+	} else {
+		cfg := &mapstructure.DecoderConfig{
+			Metadata: nil,
+			Result:   recv,
+			TagName:  "json",
+		}
+		decoder, _ := mapstructure.NewDecoder(cfg)
+		err := decoder.Decode(mapValue)
+		if err != nil {
+			return err
+		}
+		return nil
 	}
-	return nil
 }
