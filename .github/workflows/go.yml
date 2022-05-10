@@ -42,8 +42,9 @@ jobs:
       #      must add " for profile.cov on Windows OS
       run: go test -v -coverprofile="profile.cov" ./...
 
+    
     - name: Send coverage
-      uses: shogo82148/actions-goveralls@v1
+      uses: shogo82148/actions-goveralls@v1.6.0
       if: ${{ matrix.os == 'ubuntu-latest' }}
       with:
         path-to-profile: profile.cov
