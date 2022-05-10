@@ -47,7 +47,7 @@ jobs:
       uses: shogo82148/actions-goveralls@v1.6.0
       if: ${{ matrix.os == 'ubuntu-latest' }}
       with:
-        path-to-profile: profile.cov
+        # path-to-profile: profile.cov
         flag-name: Go-${{ matrix.go_version }}
         parallel: true
 
