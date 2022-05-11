@@ -1,6 +1,5 @@
 # goconf
-Configuration providers for go inspired by .net core configuration libs.
-
+Configuration providers for go inspired by .net core configuration libs. Extensible and easy to use.
 
 ## Supportives:
 - Memory source
@@ -10,6 +9,8 @@ Configuration providers for go inspired by .net core configuration libs.
 - INI file
 
 ## Features:
+- Multi providers support (merge sources)
+- Extensible providers support (new providers can be added easily, even only one function to implement a new provider using file from local filesystem)
 - Get value by full path with key delimiter (e.g. `application.bind_addr.port`)
 - Cast value to specialized type with `TypeConversionFunc`
 - Bind configuration section to struct
