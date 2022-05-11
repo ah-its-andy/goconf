@@ -39,3 +39,8 @@ var application fakeStruct.Application
 err := section.Bind(&application) //bind section to struct
 
 ```
+
+## Refer
+- [github.com/mitchellh/mapstructure](https://github.com/mitchellh/mapstructure) for binding struct
+- [gopkg.in/yaml.v2](https://gopkg.in/yaml.v2) for yaml file support
+- [github.com/stretchr/testify](https://github.com/stretchr/testify) for testing
