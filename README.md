@@ -2,11 +2,12 @@
 Configuration providers for go inspired by .net core configuration libs.
 
 
-## Providers:
-- Memory sourced provider
-- Environment variables provider
-- JSON file provider
-- YAML file provider
+## Supportives:
+- Memory source
+- Environment variables
+- JSON file
+- YAML file
+- INI file
 
 ## Features:
 - Get value by full path with key delimiter (e.g. `application.bind_addr.port`)
