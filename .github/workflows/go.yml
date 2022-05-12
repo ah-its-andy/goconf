@@ -65,6 +65,7 @@ jobs:
       uses: shogo82148/actions-goveralls@v1.6.0
       if: ${{ matrix.os == 'ubuntu-latest' }}
       with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
         path-to-profile: profile.cov
         flag-name: Go-${{ matrix.go_version }}
         parallel: true
@@ -78,3 +79,4 @@ jobs:
       - uses: shogo82148/actions-goveralls@v1.6
         with:
           parallel-finished: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
