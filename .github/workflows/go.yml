@@ -43,10 +43,10 @@ jobs:
       run: go test -v -coverprofile="profile.cov" ./...
 
     - name: Send coverage
-      uses: shogo82148/actions-goveralls@v1
+      uses: shogo82148/actions-goveralls@v1.6.0
       if: ${{ matrix.os == 'ubuntu-latest' }}
       with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
+        github-token: ${{ secrets.REPO_TOKEN }}
         path-to-profile: profile.cov
         flag-name: Go-${{ matrix.go_version }}
         parallel: true
