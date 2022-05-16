@@ -6,7 +6,6 @@ Configuration providers for go inspired by .net core configuration libs. Extensi
 [![GoDoc](https://godoc.org/github.com/ah-its-andy/goconf?status.svg)](https://pkg.go.dev/github.com/ah-its-andy/goconf)
 [![Go Report Card](https://goreportcard.com/badge/github.com/ah-its-andy/goconf)](https://goreportcard.com/report/github.com/ah-its-andy/goconf)
 [![Unit-Tests](https://github.com/ah-its-andy/goconf/workflows/Unit-Tests/badge.svg)](https://github.com/ah-its-andy/goconf/actions)
-[![Coverage Status](https://coveralls.io/repos/github/ah-its-andy/goconf/badge.svg?branch=master)](https://coveralls.io/github/ah-its-andy/goconf?branch=master)
 
 ## Supportives:
 - Memory source
